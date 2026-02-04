@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentasi Sosiologi (Video Background)</title>
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- RESET & GLOBAL --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0f0f1a;
+            /* Fallback color jika video gagal load */
+            color: #fff;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* --- VIDEO BACKGROUND --- */
+        /* Container khusus untuk memposisikan video */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            /* Di belakang semua konten */
+            object-fit: cover;
+            /* Agar video memenuhi layar tanpa distorsi */
+        }
+
+        /* Overlay Gelap Transparan */
+        /* Ini penting agar teks tetap terbaca di atas video yang bergerak */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 15, 26, 0.85);
+            /* Gelap 85% */
+            z-index: 0;
+            pointer-events: none;
+            /* Klik tembus ke konten */
+        }
+
+        /* --- CONTAINER UTAMA --- */
+        #presentation-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 1280px;
+            max-height: 720px;
+            background: rgba(22, 33, 62, 0.6);
+            /* Background container semi-transparan */
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+            border-radius: 10px;
+            z-index: 10;
+            /* Di atas overlay */
+            backdrop-filter: blur(5px);
+            /* Efek blur pada background container */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- LOGIKA SLIDE --- */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 40px 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            pointer-events: none;
+            visibility: hidden;
+            z-index: 1;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: all;
+            visibility: visible;
+            z-index: 10;
+        }
+
+        /* Background Gradient Unik tiap slide (Semi transparan agar video terlihat samar) */
+        .slide:nth-child(1) {
+            background: linear-gradient(135deg, rgba(31, 64, 104, 0.8) 0%, rgba(22, 33, 62, 0.9) 100%);
+        }
+
+        .slide:nth-child(2) {
+            background: linear-gradient(135deg, rgba(15, 52, 96, 0.8) 0%, rgba(22, 33, 62, 0.9) 100%);
+        }
+
+        .slide:nth-child(3) {
+            background: linear-gradient(135deg, rgba(44, 0, 62, 0.8) 0%, rgba(26, 26, 46, 0.9) 100%);
+        }
+
+        .slide:nth-child(4) {
+            background: linear-gradient(135deg, rgba(0, 47, 47, 0.8) 0%, rgba(22, 33, 62, 0.9) 100%);
+        }
+
+        /* --- ANIMASI ELEMEN (STAGGERED) --- */
+        .animate-element {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .slide.active .animate-element {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide.active .delay-1 {
+            transition-delay: 0.1s;
+        }
+
+        .slide.active .delay-2 {
+            transition-delay: 0.2s;
+        }
+
+        .slide.active .delay-3 {
+            transition-delay: 0.3s;
+        }
+
+        .slide.active .delay-4 {
+            transition-delay: 0.4s;
+        }
+
+        .slide.active .delay-5 {
+            transition-delay: 0.5s;
+        }
+
+        .slide.active .delay-6 {
+            transition-delay: 0.6s;
+        }
+
+        /* --- TYPOGRAPHY --- */
+        h2.slide-title {
+            font-size: 2.5rem;
+            color: #e94560;
+            margin-bottom: 30px;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            /* Shadow teks agar kontras */
+        }
+
+        p {
+            line-height: 1.6;
+            color: #ddd;
+            font-size: 1.05rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        /* --- SLIDE 1: KELOMPOK --- */
+        .group-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .group-header h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(to right, #e94560, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
+        }
+
+        .members-list {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .member-row {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            /* Efek kaca */
+            border-left: 4px solid #e94560;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 0 8px 8px 0;
+            transition: 0.3s;
+        }
+
+        .member-row:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .member-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .member-icon {
+            color: #e94560;
+            font-size: 1.2rem;
+        }
+
+        .member-id {
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* --- SLIDE 2: PENGERTIAN --- */
+        .flex-split {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            gap: 50px;
+        }
+
+        .flex-half {
+            flex: 1;
+        }
+
+        .concept-box {
+            background: rgba(233, 69, 96, 0.2);
+            border: 1px solid rgba(233, 69, 96, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            backdrop-filter: blur(3px);
+        }
+
+        .visual-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        .big-icon-circle {
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #e94560;
+            box-shadow: 0 0 30px rgba(233, 69, 96, 0.4);
+        }
+
+        .big-icon-circle i {
+            font-size: 5rem;
+            color: #fff;
+        }
+
+        /* --- SLIDE 3: CIRI-CIRI --- */
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: left;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            transition: 0.3s;
+        }
+
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+            border-color: #e94560;
+        }
+
+        .feature-icon {
+            color: #ffd700;
+            font-size: 1.5rem;
+            margin-top: 3px;
+        }
+
+        .feature-text h4 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        .feature-text p {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        /* --- SLIDE 4: FUNGSI --- */
+        .functions-container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .function-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            padding: 15px 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border-left: 4px solid #4cd137;
+            transition: 0.3s;
+        }
+
+        .function-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            padding-left: 25px;
+        }
+
+        .func-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.3);
+            min-width: 30px;
+        }
+
+        .func-content h4 {
+            font-size: 1.1rem;
+            color: #4cd137;
+            margin-bottom: 3px;
+        }
+
+        /* --- NAVIGASI & UI --- */
+        .controls {
+            position: absolute;
+            bottom: 30px;
+            right: 40px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            outline: none;
+            backdrop-filter: blur(3px);
+        }
+
+        .nav-btn:hover {
+            background: #e94560;
+            transform: scale(1.1);
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: #e94560;
+            width: 0%;
+            transition: width 0.4s ease;
+            z-index: 100;
+            box-shadow: 0 0 10px #e94560;
+        }
+
+        .slide-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 40px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 5px 10px;
+            border-radius: 15px;
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .slide {
+                padding: 20px;
+            }
+
+            .flex-split {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .big-icon-circle {
+                width: 120px;
+                height: 120px;
+            }
+
+            .big-icon-circle i {
+                font-size: 3rem;
+            }
+
+            h2.slide-title {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- VIDEO BACKGROUND -->
+    <!-- muted WAJIB ada agar autoplay berfungsi di browser modern -->
+    <video class="video-background" autoplay muted loop playsinline>
+        <!-- CONTOH VIDEO ONLINE (GANTI src DI BAWAH INI DENGAN NAMA FILE ANDA, misal: "video.mp4") -->
+        <source src="INDONESIA _ Cinematic Travel Video.mp4" type="video/mp4">
+        Browser Anda tidak mendukung tag video.
+    </video>
+
+    <!-- OVERLAY (Lapisan gelap agar teks terbaca) -->
+    <div class="overlay"></div>
+
+    <div id="presentation-container">
+        <div class="progress-bar" id="progressBar"></div>
+        <div class="slide-indicator">Halaman <span id="currentSlideNum">1</span> / <span id="totalSlides">4</span></div>
+
+        <!-- ================= HALAMAN 1 ================= -->
+        <div class="slide active" id="slide-1">
+            <header class="group-header animate-element delay-1">
+                <i class="fas fa-users-cog fa-3x" style="color: #e94560; margin-bottom: 10px;"></i>
+                <h1>Kelompok 5</h1>
+                <p>Tim Pengembang Materi Sosiologi</p>
+            </header>
+
+            <div class="members-list">
+                <div class="member-row animate-element delay-2">
+                    <div class="member-info">
+                        <div class="member-icon"><i class="fas fa-crown"></i></div>
+                        <div class="member-text">
+                            <h3>fitri.H</h3>
+                            <p>ketua</p>
+                        </div>
+                    </div>
+                    <div class="member-id">01</div>
+                </div>
+                <div class="member-row animate-element delay-3">
+                    <div class="member-info">
+                        <div class="member-icon"><i class="fas fa-pen-nib"></i></div>
+                        <div class="member-text">
+                            <h3>lala</h3>
+                            <p>penyampaian materi</p>
+                        </div>
+                    </div>
+                    <div class="member-id">02</div>
+                </div>
+                <div class="member-row animate-element delay-4">
+                    <div class="member-info">
+                        <div class="member-icon"><i class="fas fa-laptop-code"></i></div>
+                        <div class="member-text">
+                            <h3>nafiz</h3>
+                            <p>Ketua & Editor</p>
+                        </div>
+                    </div>
+                    <div class="member-id">03</div>
+                </div>
+                <div class="member-row animate-element delay-5">
+                    <div class="member-info">
+                        <div class="member-icon"><i class="fas fa-book-open"></i></div>
+                        <div class="member-text">
+                            <h3>fitri.A</h3>
+                            <p>penyampaian materi</p>
+                        </div>
+                    </div>
+                    <div class="member-id">04</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= HALAMAN 2 ================= -->
+        <div class="slide" id="slide-2">
+            <div class="flex-split">
+                <div class="flex-half">
+                    <h2 class="slide-title animate-element delay-1">Pengertian</h2>
+                    <p class="animate-element delay-2">
+                        Lembaga ekonomi adalah sistem norma yang mengatur kegiatan-kegiatan manusia dalam usaha memenuhi
+                        kebutuhan hidupnya yang berkaitan dengan segala usaha untuk menghasilkan barang dan jasa.
+                    </p>
+                    <div class="concept-box animate-element delay-3">
+                        <strong><i class="fas fa-check-circle"></i> Inti Materi:</strong><br>
+                        Mengatur tata kelola produksi, distribusi, dan konsumsi dalam masyarakat secara terstruktur.
+                    </div>
+                </div>
+                <div class="flex-half visual-center animate-element delay-4">
+                    <div class="big-icon-circle">
+                        <i class="fas fa-globe-asia"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= HALAMAN 3 ================= -->
+        <div class="slide" id="slide-3">
+            <h2 class="slide-title animate-element delay-1">Ciri-ciri Lembaga Ekonomi</h2>
+            <div class="features-grid">
+                <div class="feature-card animate-element delay-2">
+                    <i class="fas fa-balance-scale feature-icon"></i>
+                    <div class="feature-text">
+                        <h4>Teratur & Sistematis</h4>
+                        <p>Kegiatan ekonomi diatur berdasarkan aturan atau norma yang disepakati.</p>
+                    </div>
+                </div>
+                <div class="feature-card animate-element delay-3">
+                    <i class="fas fa-handshake feature-icon"></i>
+                    <div class="feature-text">
+                        <h4>Terjalin Hubungan</h4>
+                        <p>Antar pelaku ekonomi terjadi kerjasama atau transaksi yang saling membutuhkan.</p>
+                    </div>
+                </div>
+                <div class="feature-card animate-element delay-4">
+                    <i class="fas fa-clock feature-icon"></i>
+                    <div class="feature-text">
+                        <h4>Berlangsung Terus Menerus</h4>
+                        <p>Kegiatan ekonomi dilakukan secara terus-menerus untuk kelangsungan hidup.</p>
+                    </div>
+                </div>
+                <div class="feature-card animate-element delay-5">
+                    <i class="fas fa-bullseye feature-icon"></i>
+                    <div class="feature-text">
+                        <h4>Memiliki Tujuan</h4>
+                        <p>Seluruh kegiatan diarahkan untuk memenuhi kebutuhan dan mencari keuntungan.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= HALAMAN 4 ================= -->
+        <div class="slide" id="slide-4">
+            <h2 class="slide-title animate-element delay-1">Fungsi & Tujuan</h2>
+            <div class="functions-container">
+                <div class="function-item animate-element delay-2">
+                    <div class="func-number">1</div>
+                    <div class="func-content">
+                        <h4>Adaptasi Lingkungan</h4>
+                        <p>Menyesuaikan diri dengan lingkungan alam dan sosial untuk memperoleh sumber daya.</p>
+                    </div>
+                </div>
+                <div class="function-item animate-element delay-3">
+                    <div class="func-number">2</div>
+                    <div class="func-content">
+                        <h4>Distribusi Barang & Jasa</h4>
+                        <p>Mengatur pembagian hasil produksi kepada masyarakat secara adil dan merata.</p>
+                    </div>
+                </div>
+                <div class="function-item animate-element delay-4">
+                    <div class="func-number">3</div>
+                    <div class="func-content">
+                        <h4>Menciptakan Stabilitas</h4>
+                        <p>Menjaga stabilitas ekonomi agar terhindar dari inflasi atau resesi.</p>
+                    </div>
+                </div>
+                <div class="function-item animate-element delay-5">
+                    <div class="func-number">4</div>
+                    <div class="func-content">
+                        <h4>Konsumsi Terkendali</h4>
+                        <p>Mengatur pola konsumsi masyarakat agar tidak berlebihan dan merugikan.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kontrol Navigasi -->
+        <div class="controls">
+            <button class="nav-btn" id="prevBtn"><i class="fas fa-chevron-left"></i></button>
+            <button class="nav-btn" id="nextBtn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const progressBar = document.getElementById('progressBar');
+            const currentSlideNumEl = document.getElementById('currentSlideNum');
+            const totalSlidesEl = document.getElementById('totalSlides');
+            const video = document.querySelector('.video-background');
+
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+
+            totalSlidesEl.textContent = totalSlides;
+
+            // Memastikan video diputar (tambahan keamanan untuk browser tertentu)
+            if (video) {
+                video.play().catch(error => {
+                    console.log("Autoplay dicegah oleh browser, perlu interaksi user pertama kali.");
+                });
+            }
+
+            function updatePresentation() {
+                slides.forEach((slide, index) => {
+                    slide.classList.remove('active');
+                });
+
+                slides[currentSlide].classList.add('active');
+
+                const progress = ((currentSlide + 1) / totalSlides) * 100;
+                progressBar.style.width = `${progress}%`;
+
+                currentSlideNumEl.textContent = currentSlide + 1;
+
+                prevBtn.style.opacity = currentSlide === 0 ? '0.5' : '1';
+                prevBtn.style.pointerEvents = currentSlide === 0 ? 'none' : 'all';
+
+                nextBtn.innerHTML = currentSlide === totalSlides - 1
+                    ? '<i class="fas fa-redo"></i>'
+                    : '<i class="fas fa-chevron-right"></i>';
+            }
+
+            nextBtn.addEventListener('click', () => {
+                // Coba play video lagi jika user melakukan interaksi (untuk handle kebijakan browser)
+                if (video && video.paused) video.play();
+
+                if (currentSlide < totalSlides - 1) {
+                    currentSlide++;
+                } else {
+                    currentSlide = 0;
+                }
+                updatePresentation();
+            });
+
+            prevBtn.addEventListener('click', () => {
+                if (video && video.paused) video.play();
+
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    updatePresentation();
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight') nextBtn.click();
+                if (e.key === 'ArrowLeft') prevBtn.click();
+            });
+
+            updatePresentation();
+        });
+    </script>
+</body>
+
+</html>
